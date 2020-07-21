@@ -26,10 +26,11 @@ import (
 	"io"
 	"time"
 
+	"github.com/pydio/cells/common/utils/permissions"
+
 	"go.uber.org/zap"
 
 	"github.com/pydio/cells/common"
-	"github.com/pydio/cells/common/auth/claim"
 	"github.com/pydio/cells/common/log"
 	"github.com/pydio/cells/common/micro"
 	"github.com/pydio/cells/common/proto/tree"
@@ -146,8 +147,8 @@ func getMetaProviderStreamers(ctx context.Context) ([]tree.NodeProviderStreamerC
 	names = append(names, common.SERVICE_GRPC_NAMESPACE_+common.SERVICE_META)
 
 	// Load User meta (if claims are not empty!)
-	if value := ctx.Value(claim.ContextKey); value == nil {
-		log.Logger(ctx).Debug("No claims found - skipping user metas on metaStreamers init!")
+	if u, _ := permissions.FindUserNameInContext(ctx); u == "" {
+		log.Logger(ctx).Debug("No user/claims found - skipping user metas on metaStreamers init!")
 		return result, names
 	}
 
